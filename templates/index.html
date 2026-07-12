@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ration Shop Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd; --primary-hover: #0b5ed7; --secondary-color: #f0f7ff;
+            --success-color: #198754; --success-hover: #157347; --danger-color: #dc3545;
+            --danger-hover: #bb2d3b; --warning-color: #ffc107; --warning-hover: #ffb500;
+            --light-gray: #f8f9fa; --medium-gray: #e9ecef; --dark-gray: #6c757d;
+            --text-color: #212529; --white: #ffffff; --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px; --black: #212529;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--light-gray);
+            color: var(--text-color);
+            position: relative;
+        }
+        
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('/static/images/TNlogo.jpeg');
+            background-repeat: no-repeat; background-position: center center;
+            background-size: contain; opacity: 0.06; z-index: -1;
+        }
+
+        .container {
+            background-color: var(--white); padding: 1.5rem;
+            width: 100%; max-width: 950px; margin: 2rem auto;
+            border-radius: var(--border-radius); box-shadow: var(--shadow);
+        }
+        #login-container {
+            display: flex; flex-direction: column; justify-content: center;
+            min-height: 100vh; max-width: 450px; padding: 2.5rem;
+            margin: 0 auto;
+        }
+        .section {
+            border: 1px solid var(--medium-gray); border-radius: var(--border-radius);
+            padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+        h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary-color); }
+        h2 { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 500; color: var(--dark-gray); margin-bottom: 0.5rem; }
+        
+        header, footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 1rem 2rem;
+            width: 100%;
+        }
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            gap: 1.5rem; flex-wrap: nowrap; 
+        }
+        header h1 { color: var(--white); font-size: 1.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        footer { text-align: center; font-size: 0.9rem; padding: 2rem; }
+        footer p { margin: 0; opacity: 0.8; }
+        footer p:first-child { font-weight: 500; opacity: 1; margin-bottom: 0.25rem; }
+
+        input[type="text"], input[type="password"], input[type="time"], input[type="date"], input[type="tel"], input[type="search"], input[type="email"] {
+            width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius); font-family: 'Poppins', sans-serif;
+            font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+        }
+        button {
+            background-color: var(--primary-color); color: var(--white); padding: 0.8rem 1.5rem;
+            border: none; border-radius: var(--border-radius); cursor: pointer; font-size: 1rem;
+            font-weight: 500; transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: scale(0.98); }
+        #loginBtn { width: 100%; margin-top: 1.5rem; padding-block: 1rem; }
+        #logoutBtn { white-space: nowrap; background-color: var(--danger-color); }
+        #addMemberBtn, #addProductBtn { background-color: var(--success-color); }
+        #addMemberBtn:hover, #addProductBtn:hover { background-color: var(--success-hover); }
+        
+        .control-group {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem; align-items: end;
+        }
+        .control-item button { width: 100%; }
+        .members-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .members-header-left { flex-grow: 1; }
+        
+        .table-wrapper { overflow-x: auto; }
+        #members-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        #members-table th, #members-table td {
+            padding: 1rem; text-align: left; border-bottom: 1px solid var(--medium-gray);
+            vertical-align: middle;
+        }
+        #members-table th { background-color: var(--secondary-color); font-weight: 600; }
+        #members-table tr.collected-row { background-color: #f0fff4; }
+        .status-btn { padding: 0.5rem 1rem; font-size: 0.9rem; width: 110px; }
+        .status-btn.collected { background-color: var(--success-color); }
+        .action-btn {
+            background: none; border: 1px solid var(--medium-gray); width: 40px; height: 40px;
+            padding: 0; margin: 0 0.25rem; border-radius: 50%;
+        }
+        .action-btn svg { width: 18px; height: 18px; }
+        .edit-btn svg { fill: var(--dark-gray); }
+        .delete-btn svg { fill: var(--danger-color); }
+        .edit-btn:hover { background-color: #ffc10720; border-color: var(--warning-color); }
+        .delete-btn:hover { background-color: #dc354520; border-color: var(--danger-color); }
+        #no-members-row td { text-align: center; padding: 3rem; color: #777; font-style: italic; }
+        
+        #products-list { list-style: none; padding: 0; margin-top: 1.5rem; }
+        #products-list li {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem; border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius); margin-bottom: 0.5rem;
+        }
+        #products-list .remove-product-btn {
+            background-color: var(--danger-color); width: 30px; height: 30px;
+            padding: 0; border-radius: 50%; font-size: 1.2rem; color: white;
+        }
+        
+        .modal-container {
+            position: fixed; z-index: 1000; inset: 0; background-color: rgba(0, 0, 0, 0.6);
+            display: flex; justify-content: center; align-items: center; padding: 1rem;
+        }
+        .modal-content {
+            background-color: var(--white); padding: 2.5rem; border-radius: var(--border-radius);
+            width: 100%; max-width: 500px; position: relative;
+        }
+        .close-btn {
+            position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer;
+            color: #aaa; background: none; border: none; padding: 0.5rem;
+        }
+        .hidden { display: none !important; }
+
+        #dashboard { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem; text-align: center; }
+        .stat-item { padding: 1rem; flex-grow: 1;}
+        .stat-item .value { font-size: 2rem; font-weight: 700; }
+        .stat-item .label { font-size: 0.9rem; color: var(--dark-gray); }
+        #stats-total .value { color: var(--primary-color); }
+        #stats-collected .value { color: var(--success-color); }
+        #stats-pending .value { color: var(--warning-color); }
+        #print-report-btn { background-color: var(--dark-gray); }
+
+        @media (max-width: 768px) {
+            header, footer { padding: 1rem; }
+            header { gap: 0.75rem; }
+            header h1 { font-size: 1rem; }
+            #logoutBtn { padding: 0.6rem 0.8rem; font-size: 0.9rem; }
+            .container { margin: 0 auto; border-radius: 0; padding: 1rem;}
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 2rem; color: #000; }
+            #print-area h2, #print-area h3 { text-align: center; margin-bottom: 1rem; color: #000; }
+            #print-area table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+            #print-area th, #print-area td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            #print-area th { background-color: #f2f2f2; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-container">
+        <h1>Ration Shop Login</h1>
+        <div style="margin-top: 2rem;">
+            <label for="username">Login ID</label>
+            <input type="text" id="username" placeholder="e.g., kallakurichi" value="kallakurichi">
+            <label for="password" style="margin-top: 1rem;">Password</label>
+            <input type="password" id="password" placeholder="Password" value="123">
+        </div>
+        <button id="loginBtn">Login</button>
+    </div>
+    
+    <div id="app-content" class="hidden">
+        <header>
+            <h1 id="shop-name-title"></h1>
+            <button id="logoutBtn">Logout</button>
+        </header>
+
+        <main class="container">
+            <div class="section" id="dashboard">
+                <div class="stat-item" id="stats-total"><div class="value">0</div><div class="label">Total Members</div></div>
+                <div class="stat-item" id="stats-collected"><div class="value">0</div><div class="label">Collected Today</div></div>
+                <div class="stat-item" id="stats-pending"><div class="value">0</div><div class="label">Pending</div></div>
+                <button id="print-report-btn">Print Daily Report</button>
+            </div>
+
+            <div class="section">
+                <h2>Today's Available Products</h2>
+                <div class="control-group">
+                    <div class="control-item"><label for="product-en">Product Name (English)</label><input type="text" id="product-en" placeholder="e.g., Rice"></div>
+                    <div class="control-item"><label for="product-ta">Product Name (Tamil)</label><input type="text" id="product-ta" placeholder="e.g., அரிசி"></div>
+                    <div class="control-item"><button id="addProductBtn">Add Product</button></div>
+                </div>
+                <ul id="products-list"></ul>
+            </div>
+
+            <div class="section">
+                <h2>Shop Opening Controls</h2>
+                <div class="control-group">
+                    <div class="control-item"><label for="open-time">Opening Time</label><input type="time" id="open-time" value="10:00"></div>
+                    <div class="control-item"><label for="close-time">Closing Time</label><input type="time" id="close-time" value="18:00"></div>
+                    <div class="control-item"><button id="sendOpenNotificationBtn">Send Open Notification</button></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="members-header">
+                    <div class="members-header-left">
+                        <h2>Manage Members</h2>
+                        <input type="search" id="member-search" placeholder="Search by Name or ID..." style="margin-top: 0.5rem;">
+                    </div>
+                    <button id="addMemberBtn">Add New Member</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="members-table">
+                        <thead><tr><th>Member ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="members-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                 <h2>Shop Closing Controls</h2>
+                 <div class="control-group">
+                    <div class="control-item"><label for="next-date">Next Opening Date</label><input type="date" id="next-date"></div>
+                    <div class="control-item"><button id="closeShopBtn">Close Shop & Send Reminder</button></div>
+                 </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Kallakurichi Ration Shop Management System</p>
+            <p>A Digital India Initiative for Streamlined Public Distribution</p>
+        </footer>
+    </div>
+
+    <div id="memberModal" class="modal-container hidden">
+        <div class="modal-content">
+            <button id="closeModalBtn" class="close-btn" title="Close">&times;</button>
+            <h2 id="modalTitle"></h2>
+            <label for="memberName" style="margin-top: 1.5rem;">Full Name</label>
+            <input type="text" id="memberName" placeholder="Enter member's full name">
+            <label for="memberPhone" style="margin-top: 1rem;">Phone Number</label>
+            <input type="tel" id="memberPhone" placeholder="Enter 10-digit phone number">
+            <label for="memberEmail" style="margin-top: 1rem;">Email</label>
+            <input type="email" id="memberEmail" placeholder="Enter email address">
+            <input type="hidden" id="memberId">
+            <button id="saveMemberBtn" style="width: 100%; margin-top: 2rem; padding-block: 0.9rem;">Save Member</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const saveMembersToLocalStorage = (membersArray) => localStorage.setItem('rationShopMembers', JSON.stringify(membersArray));
+            const getMembersFromLocalStorage = () => JSON.parse(localStorage.getItem('rationShopMembers')) || [];
+            
+            let members = getMembersFromLocalStorage();
+            let todaysProducts = [];
+
+            const DOM = {
+                loginContainer: document.getElementById('login-container'), appContent: document.getElementById('app-content'),
+                loginBtn: document.getElementById('loginBtn'), logoutBtn: document.getElementById('logoutBtn'),
+                usernameInput: document.getElementById('username'), passwordInput: document.getElementById('password'),
+                shopTitle: document.getElementById('shop-name-title'), membersTableBody: document.getElementById('members-table-body'),
+                addMemberBtn: document.getElementById('addMemberBtn'), memberModal: document.getElementById('memberModal'),
+                closeModalBtn: document.getElementById('closeModalBtn'), saveMemberBtn: document.getElementById('saveMemberBtn'),
+                modalTitle: document.getElementById('modalTitle'), memberIdInput: document.getElementById('memberId'),
+                memberNameInput: document.getElementById('memberName'), memberPhoneInput: document.getElementById('memberPhone'),
+                memberEmailInput: document.getElementById('memberEmail'),
+                sendOpenNotificationBtn: document.getElementById('sendOpenNotificationBtn'), closeShopBtn: document.getElementById('closeShopBtn'),
+                openTimeInput: document.getElementById('open-time'), closeTimeInput: document.getElementById('close-time'),
+                nextDateInput: document.getElementById('next-date'), productEnInput: document.getElementById('product-en'),
+                productTaInput: document.getElementById('product-ta'), addProductBtn: document.getElementById('addProductBtn'),
+                productsList: document.getElementById('products-list'), memberSearchInput: document.getElementById('member-search'),
+                statsTotal: document.querySelector('#stats-total .value'), statsCollected: document.querySelector('#stats-collected .value'),
+                statsPending: document.querySelector('#stats-pending .value'), printReportBtn: document.getElementById('print-report-btn'),
+            };
+
+            const ICONS = {
+                edit: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>`,
+                delete: `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>`
+            };
+
+            const updateDashboard = () => {
+                const total = members.length;
+                const collected = members.filter(m => m.collected).length;
+                DOM.statsTotal.textContent = total;
+                DOM.statsCollected.textContent = collected;
+                DOM.statsPending.textContent = total - collected;
+            };
+            
+            const renderProducts = () => {
+                DOM.productsList.innerHTML = '';
+                todaysProducts.forEach((product, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${product.en} (${product.ta})</span><button class="remove-product-btn" data-index="${index}" title="Remove Product">&times;</button>`;
+                    DOM.productsList.appendChild(li);
+                });
+            };
+
+            const handleAddProduct = () => {
+                const en = DOM.productEnInput.value.trim();
+                const ta = DOM.productTaInput.value.trim();
+                if (en && ta) {
+                    todaysProducts.push({ en, ta });
+                    DOM.productEnInput.value = ''; DOM.productTaInput.value = '';
+                    renderProducts(); DOM.productEnInput.focus();
+                } else { alert('Please enter the product name in both English and Tamil.'); }
+            };
+
+            const renderMembers = () => {
+                const searchTerm = DOM.memberSearchInput.value.toLowerCase();
+                const filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(searchTerm) ||
+                    member.id.toString().includes(searchTerm)
+                );
+                DOM.membersTableBody.innerHTML = '';
+                if (filteredMembers.length === 0) {
+                     DOM.membersTableBody.innerHTML = `<tr id="no-members-row"><td colspan="5">No members found.</td></tr>`;
+                } else {
+                    filteredMembers.forEach(member => {
+                        const row = document.createElement('tr');
+                        if(member.collected) row.classList.add('collected-row');
+                        row.innerHTML = `<td>${member.id}</td><td>${member.name}</td><td>${member.phone}</td><td>${member.email || ''}</td>
+                        <td><button class="status-btn ${member.collected ? 'collected' : ''}" data-id="${member.id}">${member.collected ? 'Collected' : 'Pending'}</button>
+                        </td>
+                        <td>
+                            <button class="action-btn edit-btn" title="Edit" data-id="${member.id}">${ICONS.edit}</button>
+                            <button class="action-btn delete-btn" title="Delete" data-id="${member.id}">${ICONS.delete}</button></td>`;
+                        DOM.membersTableBody.appendChild(row);
+                    });
+                }
+                updateDashboard();
+            };
+
+            const closeModal = () => {
+                DOM.memberModal.classList.add('hidden');
+            };
+
+            
+            const saveMember = async () => {
+                const name = DOM.memberNameInput.value.trim();
+                const phone = DOM.memberPhoneInput.value.trim();
+                const email = DOM.memberEmailInput.value.trim();
+
+
+                if (!name || !phone) {
+                    alert('Name and Phone Number are required.');
+                    return;
+                }
+
+                await fetch('http://127.0.0.1:5000/add-member', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, email })
+                });
+
+                closeModal();
+                loadMembers();
+            };
+            const loadMembers = async () => {
+                const res = await fetch('http://127.0.0.1:5000/members');
+                members = await res.json();
+                renderMembers();
+            };
+
+            const sendOpenNotification = async () => {
+                if (!DOM.openTimeInput.value || !DOM.closeTimeInput.value) { alert("Please set opening and closing times."); return; }
+                if (members.length === 0) { alert("Add members before sending notifications."); return; }
+                if (todaysProducts.length === 0) { alert("Please add today's available products."); return; }
+                const formatTime = (time) => new Date(`1970-01-01T${time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                const productsEn = todaysProducts.map(p => `- ${p.en}`).join('\n');
+                const productsTa = todaysProducts.map(p => `- ${p.ta}`).join('\n');
+                const englishMessage = `The shop is open today from ${formatTime(DOM.openTimeInput.value)} to ${formatTime(DOM.closeTimeInput.value)}.\n\nToday's available items are:\n${productsEn}\n\nPlease collect your goods.`;
+                const tamilMessage = `இன்று கடை திறந்துள்ளது. காலை ${formatTime(DOM.openTimeInput.value)} முதல் மாலை ${formatTime(DOM.closeTimeInput.value)} வரை.\n\nஇன்று கிடைக்கும் பொருட்கள்:\n${productsTa}\n\nஉங்கள் பொருட்களை சேகரிக்கவும்.`;
+                const fullMessage = englishMessage + "\n\nTamil:\n" + tamilMessage;
+
+                
+                await fetch('http://127.0.0.1:5000/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: fullMessage })
+                });
+                alert(`--- NOTIFICATION SIMULATION ---\nMessage sent to all ${members.length} members:\n\nEnglish:\n${englishMessage}\n\nTamil:\n${tamilMessage}`);
+            };
+
+const sendCloseNotification = async () => {
+    const nextDateRaw = DOM.nextDateInput.value;
+
+    if (!nextDateRaw) {
+        alert("Please enter the next shop opening date.");
+        return;
+    }
+
+    const formattedDate = new Date(nextDateRaw).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    const uncollectedMembers = members.filter(m => !m.collected);
+
+    if (uncollectedMembers.length === 0) {
+        alert("All members have collected their goods. No reminder needed.");
+    } else {
+
+        const englishMessage = `You missed collecting your goods today. The next shop opening date is ${formattedDate}. Please collect your goods on that day. Thank you.`;
+
+        const tamilMessage = `இன்று நீங்கள் உங்கள் பொருட்களை சேகரிக்க தவறிவிட்டீர்கள். அடுத்த கடை திறக்கும் தேதி: ${formattedDate}. அன்றைய தினத்தில் உங்கள் பொருட்களை சேகரிக்கவும். நன்றி.`;
+
+        const fullMessage = englishMessage + "\n\nTamil:\n" + tamilMessage;
+
+        // ✅ SEND EMAIL ONLY TO PENDING USERS
+        await fetch('http://127.0.0.1:5000/send-reminder-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: fullMessage,
+                emails: uncollectedMembers.map(m => m.email)   // ✅ ONLY pending users
+            })
+        });
+
+        // ✅ KEEP YOUR EXISTING ALERT
+        alert(`--- NOTIFICATION SIMULATION ---\nReminder sent to ${uncollectedMembers.length} uncollected members:\n\n${englishMessage}\n${tamilMessage}`);
+    }
+
+    // ✅ KEEP YOUR EXISTING RESET LOGIC
+    members.forEach(member => member.collected = false);
+
+    saveMembersToLocalStorage(members);
+    renderMembers();
+
+    alert("Shop closed. All member statuses have been reset.");
+};
+            
+            const handlePrintReport = () => {
+                const printArea = document.createElement('div'); printArea.id = 'print-area';
+                let tableRows = '';
+                members.forEach(m => { tableRows += `<tr><td>${m.id}</td><td>${m.name}</td><td>${m.collected ? 'Collected' : 'Not Collected'}</td></tr>`; });
+                const reportDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric'});
+                printArea.innerHTML = `<h2>Daily Ration Distribution Report</h2><h3>Date: ${reportDate}</h3><table><thead><tr><th>Member ID</th><th>Name</th><th>Email</th><th>Status</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+                document.body.appendChild(printArea);
+                window.print();
+                document.body.removeChild(printArea);
+            };
+
+            const handleLogin = () => {
+                const username = DOM.usernameInput.value.trim();
+                if (username.toLowerCase() === 'kallakurichi' && DOM.passwordInput.value === '123') {
+                    DOM.loginContainer.classList.add('hidden');
+                    DOM.appContent.classList.remove('hidden');
+                    DOM.shopTitle.textContent = `${username.charAt(0).toUpperCase() + username.slice(1)} Ration Shop Management System`;
+                    loadMembers();
+                } else { alert('Invalid Login ID or Password.'); }
+            };
+            
+            const handleLogout = () => {
+                DOM.appContent.classList.add('hidden');
+                DOM.loginContainer.classList.remove('hidden');
+                DOM.passwordInput.value = '';
+                todaysProducts = []; renderProducts();
+            };
+
+            const openModal = (id = null) => {
+                DOM.memberIdInput.value = ''; DOM.memberNameInput.value = ''; DOM.memberPhoneInput.value = '';
+                DOM.modalTitle.textContent = id ? 'Edit Member' : 'Add New Member';
+                if (id) {
+                    const member = members.find(m => m.id === id);
+                    if (member) { DOM.memberIdInput.value = member.id; DOM.memberNameInput.value = member.name; DOM.memberPhoneInput.value = member.phone; }
+                }
+                DOM.memberModal.classList.remove('hidden');
+            };
+            
+            DOM.loginBtn.addEventListener('click', handleLogin);
+            DOM.logoutBtn.addEventListener('click', handleLogout);
+            DOM.addMemberBtn.addEventListener('click', () => openModal());
+            DOM.closeModalBtn.addEventListener('click', closeModal);
+            DOM.saveMemberBtn.addEventListener('click', saveMember);
+            DOM.sendOpenNotificationBtn.addEventListener('click', sendOpenNotification);
+            DOM.closeShopBtn.addEventListener('click', sendCloseNotification);
+            DOM.addProductBtn.addEventListener('click', handleAddProduct);
+            DOM.memberSearchInput.addEventListener('input', renderMembers);
+            DOM.printReportBtn.addEventListener('click', handlePrintReport);
+            DOM.productsList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-product-btn')) {
+                    todaysProducts.splice(e.target.dataset.index, 1);
+                    renderProducts();
+                }
+            });
+            DOM.membersTableBody.addEventListener('click', (e) => {
+                const target = e.target.closest('button[data-id]');
+                if (!target) return;
+                const id = parseInt(target.dataset.id);
+                if (target.classList.contains('status-btn')) {
+                    const member = members.find(m => m.id === id);
+                    if (member) { member.collected = !member.collected; saveMembersToLocalStorage(members); renderMembers(); }
+                } else if (target.classList.contains('edit-btn')) {
+                    openModal(id);
+                } else if (target.classList.contains('delete-btn')) {
+                    if (confirm('Are you sure you want to delete this member?')) {
+                        members = members.filter(m => m.id !== id);
+                        saveMembersToLocalStorage(members);
+                        renderMembers();
+                    }
+                }
+            });
+            DOM.passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        });
+    </script>
+</body>
+</html>
