@@ -191,15 +191,6 @@ The app will be available at `http://127.0.0.1:5000`
 
 ---
 
-## 🚀 Future Improvements
-
-- [ ] SMS notifications via Twilio (dependency already included)
-- [ ] Pagination/search optimization for large member lists
-- [ ] Monthly auto-reset scheduler for collection status
-- [ ] Deploy live demo link
-
----
-
 ## 👤 Author
 
 **Soorya S S**
