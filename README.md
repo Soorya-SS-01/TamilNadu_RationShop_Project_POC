@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=160&section=header&text=Ration%20Shop%20Management%20System&fontSize=32&fontColor=fff&animation=fadeIn&fontAlignY=35&desc=Digitizing%20Ration%20Distribution%20for%20Fair%20Price%20Shops&descAlignY=58&descSize=15" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=160&section=header&text=Ration%20Shop%20Management%20System&fontSize=32&fontColor=fff&animation=fadeIn&fontAlignY=35&desc=Proof%20of%20Concept%20(POC)&descAlignY=58&descSize=15" width="100%"/>
 
 <div align="center">
 
