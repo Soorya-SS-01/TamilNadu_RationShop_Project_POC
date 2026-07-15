@@ -17,7 +17,7 @@
 
 ## 📖 About the Project
 
-This Project is a **POC (Proof of Concept)** that is to prove that the idea can work in reality.
+This project is a **Proof of Concept (POC)** developed to demonstrate that the proposed idea is technically feasible and can be successfully implemented in a real-world ration distribution system.
 
 **Ration Shop Management System** is a lightweight web application built to help a Fair Price Shop (ration shop) admin digitally manage registered members, track who has collected their monthly ration, and broadcast notifications (shop open/close, reminders) to members via email — replacing manual registers and word-of-mouth announcements.
 
