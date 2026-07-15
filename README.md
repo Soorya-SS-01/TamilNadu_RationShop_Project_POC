@@ -17,6 +17,8 @@
 
 ## 📖 About the Project
 
+This Project is a POC (Proof of Concept)
+
 **Ration Shop Management System** is a lightweight web application built to help a Fair Price Shop (ration shop) admin digitally manage registered members, track who has collected their monthly ration, and broadcast notifications (shop open/close, reminders) to members via email — replacing manual registers and word-of-mouth announcements.
 
 It's a single-admin dashboard: the shop owner logs in, views all registered members, adds or removes members, marks ration as collected, and sends bulk email notifications — all from one page.
